@@ -32,6 +32,7 @@ export function setActiveInstance(vm: Component) {
 }
 
 export function initLifecycle(vm: Component) {
+  console.log('Start---->执行initLifecycle')
   const options = vm.$options
 
   // locate first non-abstract parent
@@ -56,9 +57,11 @@ export function initLifecycle(vm: Component) {
   vm._isMounted = false
   vm._isDestroyed = false
   vm._isBeingDestroyed = false
+  console.log('End------>initLifecycle')
 }
 
 export function lifecycleMixin(Vue: typeof Component) {
+  console.log('Start---->执行lifecycleMixin')
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el
@@ -134,6 +137,7 @@ export function lifecycleMixin(Vue: typeof Component) {
       vm.$vnode.parent = null
     }
   }
+  console.log('End------>lifecycleMixin')
 }
 
 export function mountComponent(
@@ -141,6 +145,7 @@ export function mountComponent(
   el: Element | null | undefined,
   hydrating?: boolean
 ): Component {
+  console.log('Start---->mountComponent 挂载实例')
   vm.$el = el
   if (!vm.$options.render) {
     // @ts-expect-error invalid type
@@ -230,6 +235,7 @@ export function mountComponent(
     vm._isMounted = true
     callHook(vm, 'mounted')
   }
+  console.log(`End------>mountComponent`)
   return vm
 }
 
@@ -374,6 +380,7 @@ export function deactivateChildComponent(vm: Component, direct?: boolean) {
 }
 
 export function callHook(vm: Component, hook: string, args?: any[]) {
+  console.log(`Start---->生命周期${hook}`)
   // #7573 disable dep collection when invoking lifecycle hooks
   pushTarget()
   const prev = currentInstance
@@ -390,4 +397,5 @@ export function callHook(vm: Component, hook: string, args?: any[]) {
   }
   setCurrentInstance(prev)
   popTarget()
+  console.log(`End------>生命周期${hook}`)
 }

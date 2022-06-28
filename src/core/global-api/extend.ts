@@ -5,6 +5,7 @@ import { defineComputed, proxy } from '../instance/state'
 import { extend, mergeOptions, validateComponentName } from '../util/index'
 
 export function initExtend(Vue: GlobalAPI) {
+  console.log('Start---->initExtend 初始化Vue.extend()')
   /**
    * Each instance constructor, including Vue, has a unique
    * cid. This enables us to create wrapped "child
@@ -75,6 +76,7 @@ export function initExtend(Vue: GlobalAPI) {
     cachedCtors[SuperId] = Sub
     return Sub
   }
+  console.log('End------>initExtend')
 }
 
 function initProps(Comp: typeof Component) {

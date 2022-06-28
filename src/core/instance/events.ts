@@ -57,6 +57,7 @@ export function updateComponentListeners(
 }
 
 export function eventsMixin(Vue: typeof Component) {
+  console.log('Start---->执行eventMixin')
   const hookRE = /^hook:/
   Vue.prototype.$on = function (
     event: string | Array<string>,
@@ -157,4 +158,5 @@ export function eventsMixin(Vue: typeof Component) {
     }
     return vm
   }
+  console.log('End------>eventMixin')
 }

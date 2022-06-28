@@ -336,6 +336,7 @@ function createWatcher(
 }
 
 export function stateMixin(Vue: typeof Component) {
+  console.log('Start---->执行stateMixin')
   // flow somehow has problems with directly declared definition object
   // when using Object.defineProperty, so we have to procedurally build up
   // the object here.
@@ -359,9 +360,11 @@ export function stateMixin(Vue: typeof Component) {
       warn(`$props is readonly.`, this)
     }
   }
+  //初始化$data,$props
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
+  //挂载$set,$delete
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 
@@ -387,4 +390,5 @@ export function stateMixin(Vue: typeof Component) {
       watcher.teardown()
     }
   }
+  console.log('End------>stateMixin')
 }

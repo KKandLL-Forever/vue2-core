@@ -6,5 +6,4 @@ extend(Vue, vca)
 
 import { effect } from 'v3/reactivity/effect'
 Vue.effect = effect
-
 export default Vue

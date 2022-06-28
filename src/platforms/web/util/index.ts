@@ -1,4 +1,4 @@
-import { warn } from 'core/util/index'
+import { warn } from 'core/util'
 
 export * from './attrs'
 export * from './class'
@@ -9,6 +9,7 @@ export * from './element'
  */
 export function query(el: string | Element): Element {
   if (typeof el === 'string') {
+    //el 为选择器
     const selected = document.querySelector(el)
     if (!selected) {
       __DEV__ && warn('Cannot find element: ' + el)
@@ -16,6 +17,7 @@ export function query(el: string | Element): Element {
     }
     return selected
   } else {
+    //el为dom元素
     return el
   }
 }

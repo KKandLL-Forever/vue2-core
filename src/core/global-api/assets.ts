@@ -3,6 +3,7 @@ import type { GlobalAPI } from 'types/global-api'
 import { isFunction, isPlainObject, validateComponentName } from '../util/index'
 
 export function initAssetRegisters(Vue: GlobalAPI) {
+  console.log('Start---->initAssetRegisters 注册内部方法')
   /**
    * Create asset registration methods.
    */
@@ -31,5 +32,7 @@ export function initAssetRegisters(Vue: GlobalAPI) {
         return definition
       }
     }
+    console.log(`注册Vue.${type}()方法`)
   })
+  console.log('End------>initAssetRegisters')
 }

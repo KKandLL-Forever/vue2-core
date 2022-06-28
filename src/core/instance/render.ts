@@ -30,10 +30,12 @@ export function initRender(vm: Component) {
   // so that we get proper render context inside it.
   // args order: tag, data, children, normalizationType, alwaysNormalize
   // internal version is used by render functions compiled from templates
+  // 对编译生成的 render 进行渲染的方法
   // @ts-expect-error
   vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
   // normalization is always applied for the public version, used in
   // user-written render functions.
+  // 对手写 render 函数进行渲染的方法
   // @ts-expect-error
   vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
 
@@ -87,6 +89,7 @@ export function setCurrentRenderingInstance(vm: Component) {
 }
 
 export function renderMixin(Vue: typeof Component) {
+  console.log('Start---->执行renderMixin')
   // install runtime convenience helpers
   installRenderHelpers(Vue.prototype)
 
@@ -120,6 +123,7 @@ export function renderMixin(Vue: typeof Component) {
       // when parent component is patched.
       setCurrentInstance(vm)
       currentRenderingInstance = vm
+      //这里的第二个参数就是h函数
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e: any) {
       handleError(e, vm, `render`)
@@ -163,4 +167,5 @@ export function renderMixin(Vue: typeof Component) {
     vnode.parent = _parentVnode
     return vnode
   }
+  console.log('End------>renderMixin')
 }

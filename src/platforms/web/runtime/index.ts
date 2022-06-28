@@ -19,6 +19,8 @@ import platformComponents from './components/index'
 import type { Component } from 'types/component'
 
 // install platform specific utils
+// 判断是否是关键属性(表单元素的input/checked/selected/muted等)
+// 如果是这些属性，设置el.props属性(属性不设置到标签上)
 Vue.config.mustUseProp = mustUseProp
 Vue.config.isReservedTag = isReservedTag
 Vue.config.isReservedAttr = isReservedAttr
@@ -26,10 +28,13 @@ Vue.config.getTagNamespace = getTagNamespace
 Vue.config.isUnknownElement = isUnknownElement
 
 // install platform runtime directives & components
+// 扩展v-model, v-show
 extend(Vue.options.directives, platformDirectives)
+// 扩展transition,transition-group组件
 extend(Vue.options.components, platformComponents)
 
 // install platform patch function
+// 注册转换DOM→虚拟DOM的patch函数
 Vue.prototype.__patch__ = inBrowser ? patch : noop
 
 // public mount method
@@ -37,7 +42,9 @@ Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
 ): Component {
+  console.log('runtime/index.ts内定义$mount----------------Start')
   el = el && inBrowser ? query(el) : undefined
+  console.log('runtime/index.ts内定义$mount----------------End')
   return mountComponent(this, el, hydrating)
 }
 
