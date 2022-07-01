@@ -120,7 +120,6 @@ function initProps(vm: Component, propsOptions: Object) {
 }
 
 function initData(vm: Component) {
-  console.log('执行initData')
   let data: any = vm.$options.data
   data = vm._data = isFunction(data) ? getData(data, vm) : data || {}
   if (!isPlainObject(data)) {
@@ -156,7 +155,7 @@ function initData(vm: Component) {
     }
   }
   //data和_data相等,对_data代理就是对data进行了代理
-  console.log(data === vm._data,'data')
+  // console.log(data === vm._data,'data')
   // observe data
   const ob = observe(data)
   ob && ob.vmCount++

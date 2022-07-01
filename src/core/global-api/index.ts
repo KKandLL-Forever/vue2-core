@@ -31,8 +31,6 @@ export function initGlobalAPI(Vue: GlobalAPI) {
   }
   Object.defineProperty(Vue, 'config', configDef)
   console.dir(`挂载config全局配置`)
-  console.log('config对象:', configDef)
-  console.log('此时的Vue：',Vue)
 
   // exposed util methods.
   // 这些工具方法不视作全局API的一部分，除非你能意识到这其中的风险，否则不要去使用(依赖)他们
@@ -59,11 +57,11 @@ export function initGlobalAPI(Vue: GlobalAPI) {
   ASSET_TYPES.forEach(type => {
     Vue.options[type + 's'] = Object.create(null)
   })
-  console.dir(`初始化Vue.options对象,此时的options:`)
-  console.log(Vue.options)
+  console.dir(`初始化Vue.options对象`)
 
   // this is used to identify the "base" constructor to extend all plain-object
-  // components with in Weex's multi-instance scenarios.
+  // components with in Weex's multi-
+  //存储Vue的构造函数
   Vue.options._base = Vue
 
   // 扩展keep-alive组件

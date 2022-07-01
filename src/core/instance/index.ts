@@ -6,6 +6,7 @@ import { lifecycleMixin } from './lifecycle'
 import { warn } from '../util/index'
 import type { GlobalAPI } from 'types/global-api'
 
+console.log('------------------instance/index.ts')
 // 此处不用 class 的原因是因为方便后续给 Vue 实例混入实例成员
 function Vue(options) {
   console.log('Start---->执行new')

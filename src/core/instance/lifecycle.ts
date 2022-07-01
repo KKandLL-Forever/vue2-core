@@ -147,9 +147,11 @@ export function mountComponent(
 ): Component {
   console.log('Start---->mountComponent 挂载实例')
   vm.$el = el
+  //没有传入render函数，会赋值createEmptyVNode方法
   if (!vm.$options.render) {
     // @ts-expect-error invalid type
     vm.$options.render = createEmptyVNode
+    //runtime版本下，如果传入了template，会警告⚠️
     if (__DEV__) {
       /* istanbul ignore if */
       if (
@@ -173,9 +175,10 @@ export function mountComponent(
   }
   callHook(vm, 'beforeMount')
 
-  let updateComponent
+  let updateComponent //这里只是定义,执行在Wather中
   /* istanbul ignore if */
   if (__DEV__ && config.performance && mark) {
+    //性能检测代码，忽略
     updateComponent = () => {
       const name = vm._name
       const id = vm._uid
@@ -193,6 +196,8 @@ export function mountComponent(
       measure(`vue ${name} patch`, startTag, endTag)
     }
   } else {
+    //_render 使用用户传入的render, 或者没传render时vue生成的render。最终返回虚拟dom
+    //_update 将传入的虚拟dom转换成真实dom，渲染到界面上
     updateComponent = () => {
       vm._update(vm._render(), hydrating)
     }
@@ -219,7 +224,7 @@ export function mountComponent(
     updateComponent,
     noop,
     watcherOptions,
-    true /* isRenderWatcher */
+    true
   )
   hydrating = false
 

@@ -80,6 +80,7 @@ export default class Watcher implements DepTarget {
     if (options) {
       this.deep = !!options.deep
       this.user = !!options.user
+      // 是否延迟更新。计算属性就是延迟更新,只有在数据变化后才会更新
       this.lazy = !!options.lazy
       this.sync = !!options.sync
       this.before = options.before
@@ -103,6 +104,7 @@ export default class Watcher implements DepTarget {
     if (isFunction(expOrFn)) {
       this.getter = expOrFn
     } else {
+      //如果expOrFn是字符串
       this.getter = parsePath(expOrFn)
       if (!this.getter) {
         this.getter = noop
@@ -115,6 +117,7 @@ export default class Watcher implements DepTarget {
           )
       }
     }
+    //如果延迟执行，调用this.get()
     this.value = this.lazy ? undefined : this.get()
   }
 
@@ -122,10 +125,12 @@ export default class Watcher implements DepTarget {
    * Evaluate the getter, and re-collect dependencies.
    */
   get() {
+    //把当前wather存入栈中，父组件的watcher会先push进去
     pushTarget(this)
     let value
     const vm = this.vm
     try {
+      //关键！ this.getter存储的就是expOrFn
       value = this.getter.call(vm, vm)
     } catch (e: any) {
       if (this.user) {

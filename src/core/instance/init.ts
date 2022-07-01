@@ -37,19 +37,29 @@ export function initMixin(Vue: typeof Component) {
     vm.__v_skip = true
     // effect scope
     vm._scope = new EffectScope(true /* detached */)
-    // 合并 options
+    // 如果是组件，合并 options
     if (options && options._isComponent) {
       // optimize internal component instantiation
       // since dynamic options merging is pretty slow, and none of the
       // internal component options needs special treatment.
       initInternalComponent(vm, options as any)
     } else {
+      //如果不是组件，将初始化时候(function Vue)传入的options和用户传入的options进行合并
       vm.$options = mergeOptions(
-        // 将初始化时候传入的options和用户传入的options进行合并
+        //vm.constructor指向Vue的构造函数
+        //这里可以通过vm.constructor获取到挂载在构造函数上的属性
+        //例如:
+        // function myVue (options){
+        //   console.log(options)
+        // }
+        // myVue.options = {data2: 200}
+        // let m = new myVue({data: 100})
+        // console.log(m.constructor.options);// {data2: 200}
         resolveConstructorOptions(vm.constructor as any),
         options || {},
         vm
       )
+
     }
     /* istanbul ignore else */
     if (__DEV__) {
@@ -109,6 +119,7 @@ export function initInternalComponent(
   opts._componentTag = vnodeComponentOptions.tag
 
   if (options.render) {
+    //如果在new Vue()时传入了render()函数
     opts.render = options.render
     opts.staticRenderFns = options.staticRenderFns
   }
@@ -117,6 +128,7 @@ export function initInternalComponent(
 export function resolveConstructorOptions(Ctor: typeof Component) {
   let options = Ctor.options
   if (Ctor.super) {
+    //如果是组件。super是组件上的一个static属性
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSuperOptions = Ctor.superOptions
     if (superOptions !== cachedSuperOptions) {
@@ -135,6 +147,7 @@ export function resolveConstructorOptions(Ctor: typeof Component) {
       }
     }
   }
+  //如果不是组件，直接返回构造函数上的options
   return options
 }
 

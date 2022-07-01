@@ -6,20 +6,46 @@
   <script src="../dist/vue.js"></script>
 </head>
 <body>
+<div id="demo-template">
+  <span>I am a demo</span>
+</div>
 <div id="app"></div>
 <script>
-  // import Vue from '../types'
+  // Vue.component('demo', {
+  //   template: '#demo-template'
+  // })
+  // let app = new Vue({
+  //   el: '#app',
+  //   data: {
+  //     msg: 'hello',
+  //     obj: {
+  //       a: 123
+  //     }
+  //   },
+  //   template: `
+  //     <div>
+  //       <span>
+  //          hello Vue
+  //       </span>
+  //       <demo></demo>
+  //     </div>
+  //   `
+  // })
 
-  let app = new Vue({
+
+
+
+  let app2 = new Vue({
     el: '#app',
     data: {
-      msg: 'hello',
-      obj: {
-        a: 123
-      }
+      msg: 'hello app2'
     },
-    template: `<div>hello Vue</div>`
+    template: `<div>{{msg}}</div>`
   })
+
+
+
+
   // console.log(app,'app')
 </script>
 

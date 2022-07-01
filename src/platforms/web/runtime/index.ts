@@ -18,6 +18,7 @@ import platformDirectives from './directives/index'
 import platformComponents from './components/index'
 import type { Component } from 'types/component'
 
+console.log('------------------runtime/index.ts')
 // install platform specific utils
 // 判断是否是关键属性(表单元素的input/checked/selected/muted等)
 // 如果是这些属性，设置el.props属性(属性不设置到标签上)
@@ -42,9 +43,12 @@ Vue.prototype.$mount = function (
   el?: string | Element,
   hydrating?: boolean
 ): Component {
-  console.log('runtime/index.ts内定义$mount----------------Start')
+  // console.log('runtime/index.ts内定义$mount----------------Start')
+  //这里再次获取el的原因是
+  //如果我们使用的不是运行编译时版本
+  //那mount时会直接执行这个$mount
   el = el && inBrowser ? query(el) : undefined
-  console.log('runtime/index.ts内定义$mount----------------End')
+  // console.log('runtime/index.ts内定义$mount----------------End')
   return mountComponent(this, el, hydrating)
 }
 

@@ -82,6 +82,7 @@ if (__DEV__) {
   }
 
   initProxy = function initProxy(vm) {
+    // 浏览器是否支持Proxy
     if (hasProxy) {
       // determine which proxy handler to use
       const options = vm.$options
