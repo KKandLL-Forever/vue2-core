@@ -125,7 +125,7 @@ export default class Watcher implements DepTarget {
    * Evaluate the getter, and re-collect dependencies.
    */
   get() {
-    //把当前wather存入栈中，父组件的watcher会先push进去
+    //把当前watcher存入栈中，父组件的watcher会先push进去
     pushTarget(this)
     let value
     const vm = this.vm

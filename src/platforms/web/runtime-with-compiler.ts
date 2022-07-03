@@ -96,6 +96,7 @@ Vue.prototype.$mount = function (
         },
         this
       )
+      //保存在options里，也就保存在了$options里
       options.render = render
       options.staticRenderFns = staticRenderFns
 
