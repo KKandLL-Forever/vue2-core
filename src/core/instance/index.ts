@@ -17,15 +17,15 @@ function Vue(options) {
   console.log('End------>new')
 }
 
-// 注册 vm 的 _init() 方法，初始化 vm
+// 注册Vue原型上的 _init() 方法，初始化 vm
 //@ts-expect-error Vue has function type
 initMixin(Vue)
 
-// 注册 vm 实例的 $data/$props/$set/$delete/$watch
+// 注册跟数据相关的 $data/$props/$set/$delete/$watch
 //@ts-expect-error Vue has function type
 stateMixin(Vue)
 
-// 初始化事件相关方法 $on/$once/$off/$emit
+// 初始化跟事件相关方法 $on/$once/$off/$emit
 //@ts-expect-error Vue has function type
 eventsMixin(Vue)
 
@@ -33,8 +33,9 @@ eventsMixin(Vue)
 //@ts-expect-error Vue has function type
 lifecycleMixin(Vue)
 
-// 混入 render $nextTick/_render
+// 混入渲染相关的函数 $nextTick/_render
 //@ts-expect-error Vue has function type
 renderMixin(Vue)
 
+console.log(Vue)
 export default Vue as unknown as GlobalAPI

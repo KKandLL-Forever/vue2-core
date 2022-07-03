@@ -65,7 +65,6 @@ Vue.prototype.$mount = function (
           }
         }
       } else if (template.nodeType) {
-        console.log(template,'wo shi yuansu ssssssssss')
         // 如果模板是元素，返回元素的 innerHTML
         template = template.innerHTML
       } else {

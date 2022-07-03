@@ -56,6 +56,7 @@ function mergeData(
   if (!from) return to
   let key, toVal, fromVal
 
+  // Reflect.ownKeys可以拿到Symbol属性
   const keys = hasSymbol
     ? (Reflect.ownKeys(from) as string[])
     : Object.keys(from)
@@ -67,12 +68,14 @@ function mergeData(
     toVal = to[key]
     fromVal = from[key]
     if (!hasOwn(to, key)) {
+      //子的数据父没有，则将新增的数据加入响应式系统中
       set(to, key, fromVal)
     } else if (
       toVal !== fromVal &&
       isPlainObject(toVal) &&
       isPlainObject(fromVal)
     ) {
+      // 处理深层对象，当合并的数据为多层嵌套对象时，需要递归调用mergeData进行比较合并
       mergeData(toVal, fromVal)
     }
   }
@@ -90,9 +93,11 @@ export function mergeDataOrFn(
   if (!vm) {
     // in a Vue.extend merge, both should be functions
     if (!childVal) {
+      // 子类不存在data选项，则合并结果为父类data选项
       return parentVal
     }
     if (!parentVal) {
+      // 父类不存在data选项，则合并结果为子类data选项
       return childVal
     }
     // when parentVal & childVal are both present,
@@ -100,13 +105,16 @@ export function mergeDataOrFn(
     // merged result of both functions... no need to
     // check if parentVal is a function here because
     // it has to be a function to pass previous merges.
+    // data选项在父类和子类同时存在的情况下返回的是 一个函数
     return function mergedDataFn() {
       return mergeData(
+        // 子类实例和父类实例，分别将子类和父类实例中data函数执行后返回的对象传递给mergeData 函数做数据合并
         isFunction(childVal) ? childVal.call(this, this) : childVal,
         isFunction(parentVal) ? parentVal.call(this, this) : parentVal
       )
     }
   } else {
+    // Vue实例
     return function mergedInstanceDataFn() {
       // instance merge
       const instanceData = isFunction(childVal)
@@ -116,21 +124,26 @@ export function mergeDataOrFn(
         ? parentVal.call(vm, vm)
         : parentVal
       if (instanceData) {
+        // 当实例中传递data选项时，将实例的data对象和Vm构造函数上的data属性选项合并
         return mergeData(instanceData, defaultData)
       } else {
+        // 当实例中不传递data时，默认返回Vm构造函数上的data属性选项
         return defaultData
       }
     }
   }
 }
 
+// data的合并策略
 strats.data = function (
   parentVal: any,
   childVal: any,
   vm?: Component
 ): Function | null {
   if (!vm) {
+    // vm代表是否为Vue创建的实例，否则是子父类的关系
     if (childVal && typeof childVal !== 'function') {
+      // 必须保证子类的data类型是 一个函数而不是一个对象
       __DEV__ &&
         warn(
           'The "data" option should be a function ' +
@@ -144,6 +157,7 @@ strats.data = function (
     return mergeDataOrFn(parentVal, childVal)
   }
 
+  // vue实例时需要传递vm作为函数的第 三个参数
   return mergeDataOrFn(parentVal, childVal, vm)
 }
 
@@ -154,6 +168,9 @@ export function mergeLifecycleHook(
   parentVal: Array<Function> | null,
   childVal: Function | Array<Function> | null
 ): Array<Function> | null {
+  // 1.如果子类和父类都拥有钩子选项，则将子类选项和父类选项合并,
+  // 2.如果父类不存在钩子选项，子类存在时，则以数组形式返回子类钩子选项，
+  // 3.当子类不存在钩子选项时，则以父类选项返回。
   const res = childVal
     ? parentVal
       ? parentVal.concat(childVal)
@@ -163,7 +180,7 @@ export function mergeLifecycleHook(
     : parentVal
   return res ? dedupeHooks(res) : res
 }
-
+// 防止多个组件实例钩子选项相互影响
 function dedupeHooks(hooks: any) {
   const res: Array<any> = []
   for (let i = 0; i < hooks.length; i++) {
@@ -191,18 +208,22 @@ function mergeAssets(
   vm: Component | null,
   key: string
 ): Object {
+  // 创建一个空对象，其原型指向父类的资源 选项。
   const res = Object.create(parentVal || null)
   if (childVal) {
+    // components,filters,directives选项必须为对象
     __DEV__ && assertObjectType(key, childVal, vm)
+    // 子类选项赋值给空对象
     return extend(res, childVal)
   } else {
     return res
   }
 }
 
+// 定义资源合并的策略
 ASSET_TYPES.forEach(function (type) {
   strats[type + 's'] = mergeAssets
-})
+})// 定义默认策略
 
 /**
  * Watchers.
@@ -210,6 +231,7 @@ ASSET_TYPES.forEach(function (type) {
  * Watchers hashes should not overwrite one
  * another, so we merge them as arrays.
  */
+//最终和父类选项合并成数组，并且数组的选项成员，可以是回 调函数，选项对象，或者函数名。
 strats.watch = function (
   parentVal: Record<string, any> | null,
   childVal: Record<string, any> | null,
@@ -243,6 +265,7 @@ strats.watch = function (
 /**
  * Other object hashes.
  */
+//如果父类不存在选项，则返回子类选项，子类父类都存在时，用子类选项去覆盖父类选项。
 strats.props =
   strats.methods =
   strats.inject =
@@ -274,6 +297,7 @@ const defaultStrat = function (parentVal: any, childVal: any): any {
 /**
  * Validate component names
  */
+// components规范检查函数
 function checkComponents(options: Record<string, any>) {
   for (const key in options.components) {
     validateComponentName(key)
@@ -282,6 +306,7 @@ function checkComponents(options: Record<string, any>) {
 
 export function validateComponentName(name: string) {
   if (
+    // 正则判断检测是否为非法的标签，例如数字开头
     !new RegExp(`^[a-zA-Z][\\-\\.0-9_${unicodeRegExp.source}]*$`).test(name)
   ) {
     warn(
@@ -291,6 +316,7 @@ export function validateComponentName(name: string) {
         'should conform to valid custom element name in html5 specification.'
     )
   }
+  // 不能使用Vue自身自定义的组件名，如slot, component,不能使用html的保留标签，如 h1, svg等
   if (isBuiltInTag(name) || config.isReservedTag(name)) {
     warn(
       'Do not use built-in or reserved HTML elements as component ' +
@@ -305,18 +331,24 @@ export function validateComponentName(name: string) {
  * Object-based format.
  */
 function normalizeProps(options: Record<string, any>, vm?: Component | null) {
+  // props选项数据有两种形式:
+  // 一种是['a', 'b', 'c']
+  // 一种是{ a: { type: 'String', default: 'hello' }}
   const props = options.props
   if (!props) return
   const res: Record<string, any> = {}
   let i, val, name
+  // 数组
   if (isArray(props)) {
     i = props.length
     while (i--) {
       val = props[i]
       if (typeof val === 'string') {
         name = camelize(val)
+        // 默认将数组形式的props转换为对象形式。
         res[name] = { type: null }
       } else if (__DEV__) {
+        // 规则:保证是字符串
         warn('props must be strings when using array syntax.')
       }
     }
@@ -327,6 +359,7 @@ function normalizeProps(options: Record<string, any>, vm?: Component | null) {
       res[name] = isPlainObject(val) ? val : { type: val }
     }
   } else if (__DEV__) {
+    // 非数组，非对象则判定props选项传递非法
     warn(
       `Invalid value for option "props": expected an Array or an Object, ` +
         `but got ${toRawType(props)}.`,
@@ -343,11 +376,14 @@ function normalizeInject(options: Record<string, any>, vm?: Component | null) {
   const inject = options.inject
   if (!inject) return
   const normalized: Record<string, any> = (options.inject = {})
+  //数组的形式
   if (isArray(inject)) {
     for (let i = 0; i < inject.length; i++) {
+      // from: 属性是在可用的注入内容中搜索用的 key (字符串或 Symbol)
       normalized[inject[i]] = { from: inject[i] }
     }
   } else if (isPlainObject(inject)) {
+    // 对象的处理
     for (const key in inject) {
       const val = inject[key]
       normalized[key] = isPlainObject(val)
@@ -355,6 +391,7 @@ function normalizeInject(options: Record<string, any>, vm?: Component | null) {
         : { from: val }
     }
   } else if (__DEV__) {
+    // 非法规则
     warn(
       `Invalid value for option "inject": expected an Array or an Object, ` +
         `but got ${toRawType(inject)}.`,
@@ -371,6 +408,7 @@ function normalizeDirectives(options: Record<string, any>) {
   if (dirs) {
     for (const key in dirs) {
       const def = dirs[key]
+      // 函数简写同样会转换成对象的形式
       if (isFunction(def)) {
         dirs[key] = { bind: def, update: def }
       }
@@ -406,6 +444,7 @@ export function mergeOptions(
     child = child.options
   }
 
+  // props,inject,directives的校验和规范化
   normalizeProps(child, vm)
   normalizeInject(child, vm)
   normalizeDirectives(child)
@@ -414,6 +453,7 @@ export function mergeOptions(
   // but only if it is a raw options object that isn't
   // the result of another mergeOptions call.
   // Only merged options has the _base property.
+  // 针对extends扩展的子类构造器
   if (!child._base) {
     if (child.extends) {
       parent = mergeOptions(parent, child.extends, vm)
@@ -436,7 +476,9 @@ export function mergeOptions(
     }
   }
   function mergeField(key: any) {
+    // 拿到各个选择指定的选项配置，如果没有则用默认的配置
     const strat = strats[key] || defaultStrat
+    // 执行各自的合并策略
     options[key] = strat(parent[key], child[key], vm, key)
   }
   return options
