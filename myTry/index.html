@@ -7,17 +7,20 @@
 </head>
 <body>
 <div id="demo-template">
-  <span>I am a demo</span>
+  <span>{{msg}}</span>
 </div>
 <div id="app"></div>
 <script>
   // Vue.component('demo', {
+  //   props:{
+  //     msg: String
+  //   },
   //   template: '#demo-template'
   // })
   // let app = new Vue({
   //   el: '#app',
   //   data: {
-  //     msg: 'hello',
+  //     msg: 'hello!!!!!!',
   //     obj: {
   //       a: 123
   //     }
@@ -25,9 +28,9 @@
   //   template: `
   //     <div>
   //       <span>
-  //          hello Vue
+  //          Vue
   //       </span>
-  //       <demo></demo>
+  //       <demo :msg="msg"></demo>
   //     </div>
   //   `
   // })
@@ -40,7 +43,10 @@
     data: {
       msg: 'hello app2'
     },
-    template: `<div>{{msg}}</div>`
+    template: `<div>{{msg}}</div>`,
+    mounted(){
+      setTimeout(() => this.msg = 'changed',2000)
+    }
   })
 
 

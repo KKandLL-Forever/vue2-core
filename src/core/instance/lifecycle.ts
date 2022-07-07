@@ -175,7 +175,7 @@ export function mountComponent(
   }
   callHook(vm, 'beforeMount')
 
-  let updateComponent //这里只是定义,执行在Wather中
+  let updateComponent //这里只是定义,执行在Watcher中
   /* istanbul ignore if */
   if (__DEV__ && config.performance && mark) {
     //性能检测代码，忽略

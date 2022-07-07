@@ -480,7 +480,9 @@ export function mergeOptions(
     const strat = strats[key] || defaultStrat
     // 执行各自的合并策略
     options[key] = strat(parent[key], child[key], vm, key)
+    console.log(`mergeOptions合并了${key}选项`)
   }
+
   return options
 }
 

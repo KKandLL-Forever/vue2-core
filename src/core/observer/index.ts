@@ -38,7 +38,7 @@ export function toggleObserving(value: boolean) {
  * collect dependencies and dispatch updates.
  */
 export class Observer {
-  // 依赖对象
+  // 管理依赖的Dep类
   dep: Dep
   // 实例计数器
   vmCount: number // number of vms that have this object as root $data
@@ -149,25 +149,34 @@ export function defineReactive(
   key: string,
   val?: any,
   customSetter?: Function | null,
-  shallow?: boolean
+  shallow?: boolean //是否为基础类型
 ) {
   // 创建依赖对象实例
   const dep = new Dep()
 
   // 获取 obj 的属性描述符对象
+  // getOwnPropertyDescriptor返回如下结构：
+  // {
+  //   "value": 100,
+  //   "writable": true,
+  //   "enumerable": true,
+  //   "configurable": true
+  // }
   const property = Object.getOwnPropertyDescriptor(obj, key)
   if (property && property.configurable === false) {
+    // 属性必须满足可配置
     return
   }
 
   // cater for pre-defined getter/setters
-  // 提供预定义的存取器函数
+  // 提供预定义的存取器函数, 也就是用户对obj自定义的getter和setter
   const getter = property && property.get
   const setter = property && property.set
   if (
     (!getter || setter) &&
     (val === NO_INIITIAL_VALUE || arguments.length === 2)
   ) {
+    //只传了2个参数时，直接获取value
     val = obj[key]
   }
 
@@ -206,7 +215,7 @@ export function defineReactive(
       // 如果预定义的 getter 存在则 value 等于getter 调用的返回值
       // 否则直接赋予属性值
       const value = getter ? getter.call(obj) : val
-      // 如果新值等于旧值或者新值旧值为NaN则不执行
+      // 如果新值等于旧值或者新值旧值为NaN则return
       if (!hasChanged(value, newVal)) {
         return
       }

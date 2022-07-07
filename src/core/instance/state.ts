@@ -69,12 +69,15 @@ export function initState(vm: Component) {
   }
 }
 
+//将组件的 props 数据设置为响应式数据
+// propsOptions就是定义prop的那些选项
 function initProps(vm: Component, propsOptions: Object) {
   const propsData = vm.$options.propsData || {}
   const props = (vm._props = {})
   // cache prop keys so that future props updates can iterate using Array
   // instead of dynamic object key enumeration.
   const keys: string[] = (vm.$options._propKeys = [])
+  //有$parent就不是根实例
   const isRoot = !vm.$parent
   // root instance props should be converted
   if (!isRoot) {
@@ -113,6 +116,7 @@ function initProps(vm: Component, propsOptions: Object) {
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.
     if (!(key in vm)) {
+      //用户通过 vm.XXX 可以代理访问 到 vm._props 上的值
       proxy(vm, `_props`, key)
     }
   }
@@ -144,10 +148,12 @@ function initData(vm: Component) {
   while (i--) {
     const key = keys[i]
     if (__DEV__) {
+      // 命名不能和方法重复
       if (methods && hasOwn(methods, key)) {
         warn(`Method "${key}" has already been defined as a data property.`, vm)
       }
     }
+    // 命名不能和props重复
     if (props && hasOwn(props, key)) {
       __DEV__ &&
         warn(
@@ -156,13 +162,12 @@ function initData(vm: Component) {
           vm
         )
     } else if (!isReserved(key)) {
+      // proxy 会对 data 做一层代理，直接通过 vm.XXX 可以代理访问到 vm._data 上挂载的对 象属性。
       proxy(vm, `_data`, key)
     }
   }
-  //data和_data相等,对_data代理就是对data进行了代理
-  // console.log(data === vm._data,'data')
-  // observe data
 
+  // observe data
   // 响应式处理
   const ob = observe(data)
   ob && ob.vmCount++
@@ -192,12 +197,14 @@ function initComputed(vm: Component, computed: Object) {
   for (const key in computed) {
     const userDef = computed[key]
     const getter = isFunction(userDef) ? userDef : userDef.get
+    // computed属性为对象时，要保证有getter方法
     if (__DEV__ && getter == null) {
       warn(`Getter is missing for computed property "${key}".`, vm)
     }
 
     if (!isSSR) {
       // create internal watcher for the computed property.
+      // 创建computed watcher
       watchers[key] = new Watcher(
         vm,
         getter || noop,
@@ -210,9 +217,11 @@ function initComputed(vm: Component, computed: Object) {
     // component prototype. We only need to define computed properties defined
     // at instantiation here.
     if (!(key in vm)) {
+      // 设置为响应式数据
       defineComputed(vm, key, userDef)
     } else if (__DEV__) {
       if (key in vm.$data) {
+        // 不能和props，data命名冲突
         warn(`The computed property "${key}" is already defined in data.`, vm)
       } else if (vm.$options.props && key in vm.$options.props) {
         warn(`The computed property "${key}" is already defined as a prop.`, vm)
